@@ -115,8 +115,10 @@ function Set-TargetResource
 
     $arguments = Get-RobocopyArguments $Source $Destination $Files $Retry $Wait $SubdirectoriesIncludingEmpty $Restartable $MultiThreaded $ExcludeFiles $LogOutput $AppendLog $AdditionalArgs
 
-    Write-Verbose "Executing robocopy.exe with: $arguments"
-    &robocopy $arguments | Out-Null
+	Write-Verbose ("Robocopy arguments: " + ($arguments | ConvertTo-Json))
+    $output = & robocopy.exe $arguments
+	Write-Verbose ("Robocopy output: " + ($output | ConvertTo-Json))
+
     if($LASTEXITCODE -ge 8)
     {
         throw "robocopy returned with errors! Exit code: $LASTEXITCODE! More info here:https://support.microsoft.com/en-us/kb/954404"
@@ -174,8 +176,10 @@ function Test-TargetResource
     {
         $arguments += '/L'
     }
-    
-    &robocopy $arguments | Out-Null
+
+	Write-Verbose ("Robocopy arguments: " + ($arguments | ConvertTo-Json))
+    $output = & robocopy.exe $arguments
+	Write-Verbose ("Robocopy output: " + ($output | ConvertTo-Json))
 
     # https://support.microsoft.com/en-us/kb/954404
     # ROBOCOPY $LASTEXITCODE is a bitflag:
@@ -197,7 +201,7 @@ function Test-TargetResource
     }
     else
     {
-        throw "robocopy returned with errors! Exit code: $result! More info here:https://support.microsoft.com/en-us/kb/954404"
+        throw "robocopy returned with errors! Exit code: $LASTEXITCODE! More info here:https://support.microsoft.com/en-us/kb/954404"
     }
     
     return $result
